@@ -46,3 +46,9 @@ TELEGRAM_CHAT_ID=your_chat_id
 POSTGRES_DB=finance_db
 POSTGRES_USER=myuser
 POSTGRES_PASSWORD=mypassword
+
+# Infrastructure (DB, Redis) 실행
+docker-compose up -d
+
+# Application 빌드 및 실행
+./gradlew bootRun
