@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: my-stock
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/finance_db
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  data:
+    redis:
+      host: localhost
+      port: 6300
+
+  ai:
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY}
+        chat:
+          options:
+            model: gemini-2.5-flash
+            temperature: 0.7
+
+api:
+  finance:
+    key: ${FINANCE_API_KEY}
+    base-url: https://www.alphavantage.co
+
+market:
+  monitor:
+    symbols: AAPL,MSFT,TSLA
+
+telegram:
+  bot-token: ${TELEGRAM_BOT_TOKEN}
+  chat-id: ${TELEGRAM_CHAT_ID}
+
+resilience4j:
+  ratelimiter:
+    instances:
+      alphaVantage:
+        limitForPeriod: 5
+        limitRefreshPeriod: 60s
+        timeoutDuration: 2s
+  retry:
+    instances:
+      alphaVantage:
+        maxAttempts: 3
+        waitDuration: 750ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - com.app.my_stock.infrastructure.marketdata.alphavantage.AlphaVantageTransientException
+          - com.app.my_stock.infrastructure.marketdata.alphavantage.AlphaVantageRateLimitException
